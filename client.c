@@ -6,7 +6,7 @@
 /*   By: axlleres <axlleres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:16:08 by axlleres          #+#    #+#             */
-/*   Updated: 2025/02/18 20:28:35 by axlleres         ###   ########.fr       */
+/*   Updated: 2025/03/05 18:32:00 by axlleres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <sys/types.h>
+
+int	g_has_received = 0;
 
 int	write_error(char *error)
 {
@@ -48,24 +50,55 @@ int	ft_atoi(char *str)
 void	send_char(char c, int pid)
 {
 	int	i;
+	int	err;
+	int	signal;
+	int	try;
 
 	i = 7;
 	while (i >= 0)
 	{
 		if ((c >> i) & 1)
-			kill(pid, SIGUSR1);
+			signal = SIGUSR1;
 		else
-			kill(pid, SIGUSR2);
+			signal = SIGUSR2;
+		err = kill(pid, signal);
+		if (err == -1)
+		{
+			write_error("Error sending signal to server (check the pid)\n");
+			exit(1);
+		}
+		try = 0;
+		while (g_has_received == 0 && try++ < 1000000)
+			usleep(1);
+		g_has_received = 0;
 		i--;
-		usleep(500);
 	}
 }
 
 void	sig_handler(int signo)
 {
-	(void)signo;
-	write(1, "Server received our message\n", 28);
-	exit(0);
+	if (signo == SIGUSR1)
+	{
+		write(1, "Server received our message\n", 28);
+		exit(0);
+	}
+	else if (g_has_received == 0)
+		g_has_received = 1;
+}
+
+void	init(int pid)
+{
+	int	try;
+
+	if (kill(pid, SIGUSR1) == -1)
+	{
+		write_error("Error sending signal to server (check the pid)\n");
+		exit(1);
+	}
+	try = 0;
+	while (g_has_received == 0 && try++ < 1000000)
+		usleep(1);
+	g_has_received = 0;
 }
 
 int	main(int argc, char **argv)
@@ -75,9 +108,11 @@ int	main(int argc, char **argv)
 	char	*message;
 
 	signal(SIGUSR1, sig_handler);
+	signal(SIGUSR2, sig_handler);
 	if (argc != 3)
 		return (write_error("Wrong arguments\nUsage: <PID> <message>\n"));
 	pid = ft_atoi(argv[1]);
+	init(pid);
 	if (pid == -1)
 		return (write_error("Wrong PID\n"));
 	message = argv[2];

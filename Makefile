@@ -9,9 +9,9 @@ OBJS_CLT = $(SRCS_CLT:.c=.o)
 SRV = server
 CLT = client
 
-CFLAGS = -Wall -Wextra -Werror 
+CFLAGS = -Wall -Wextra -Werror
 LDFLAGS =
-CC = cc
+CC = clang
 
 all: $(NAME)
 
