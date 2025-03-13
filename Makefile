@@ -1,7 +1,7 @@
 NAME = minitalk
 
-SRCS_SRV = server.c
-SRCS_CLT = client.c
+SRCS_SRV = server.c server2.c
+SRCS_CLT = client.c client2.c
 
 OBJS_SRV = $(SRCS_SRV:.c=.o)
 OBJS_CLT = $(SRCS_CLT:.c=.o)

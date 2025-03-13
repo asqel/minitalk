@@ -6,7 +6,7 @@
 /*   By: axlleres <axlleres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 20:16:08 by axlleres          #+#    #+#             */
-/*   Updated: 2025/03/05 18:32:00 by axlleres         ###   ########.fr       */
+/*   Updated: 2025/03/13 16:23:19 by axlleres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,16 +18,7 @@
 
 int	g_has_received = 0;
 
-int	write_error(char *error)
-{
-	int	len;
-
-	len = 0;
-	while (error[len])
-		len++;
-	write(2, error, len);
-	return (1);
-}
+extern int	write_error(char *s);
 
 int	ft_atoi(char *str)
 {
